@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام التوثيق التربوي - مدارس الإيمان للبنات</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #1a5276;
+  --primary-light: #2980b9;
+  --primary-soft: #d6eaf8;
+  --accent: #c0392b;
+  --accent-light: #e74c3c;
+  --gold: #d4a017;
+  --gold-light: #f0c040;
+  --bg: #f0f4f8;
+  --bg-card: #ffffff;
+  --text: #1a202c;
+  --text-muted: #5a6a7a;
+  --border: #d0dce8;
+  --success: #27ae60;
+  --shadow: 0 4px 20px rgba(26,82,118,0.12);
+  --shadow-hover: 0 8px 30px rgba(26,82,118,0.2);
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  direction: rtl;
+}
+
+/* ===== HEADER ===== */
+.site-header {
+  background: linear-gradient(135deg, var(--primary) 0%, #0d3b6e 60%, #1a5276 100%);
+  color: white;
+  padding: 20px 30px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.site-header::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.header-inner { position: relative; display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
+.school-logo-area { display: flex; align-items: center; gap: 16px; }
+.school-logo {
+  width: 80px; height: 80px; border-radius: 50%;
+  border: 3px solid var(--gold-light);
+  background: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 0 20px rgba(212,160,23,0.4);
+  overflow: hidden;
+}
+.school-logo img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.school-logo-placeholder { font-size: 32px; }
+.school-info h1 { font-size: 1.8rem; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+.school-info p { font-size: 0.9rem; opacity: 0.85; margin-top: 4px; }
+.header-badge {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.8rem;
+  backdrop-filter: blur(10px);
+}
+
+/* ===== NAV ===== */
+.main-nav {
+  background: var(--bg-card);
+  border-bottom: 2px solid var(--primary-soft);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  position: sticky; top: 0; z-index: 100;
+}
+.nav-btn {
+  padding: 14px 20px;
+  border: none; background: none;
+  color: var(--text-muted);
+  font-family: 'Cairo', sans-serif;
+  font-size: 0.9rem; font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+  display: flex; align-items: center; gap: 8px;
+}
+.nav-btn:hover { color: var(--primary); }
+.nav-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  background: var(--primary-soft);
+}
+.nav-icon { font-size: 1.1rem; }
+
+/* ===== STATS BAR ===== */
+.stats-bar {
+  background: linear-gradient(135deg, var(--primary-soft), #e8f4fd);
+  padding: 16px 24px;
+  display: flex; gap: 16px; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+}
+.stat-item {
+  display: flex; align-items: center; gap: 10px;
+  background: white;
+  padding: 10px 18px;
+  border-radius: 40px;
+  box-shadow: var(--shadow);
+  font-size: 0.88rem;
+}
+.stat-num { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+.stat-label { color: var(--text-muted); font-weight: 500; }
+
+/* ===== MAIN CONTENT ===== */
+.content { padding: 24px; max-width: 1200px; margin: 0 auto; }
+.section { display: none; }
+.section.active { display: block; }
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 24px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.card-header {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  padding: 16px 24px;
+  display: flex; align-items: center; gap: 12px;
+}
+.card-header h2 { font-size: 1.1rem; font-weight: 700; }
+.card-header-icon { font-size: 1.4rem; }
+.card-body { padding: 24px; }
+
+/* ===== FORM ===== */
+.section-label {
+  font-size: 0.78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--primary);
+  margin: 20px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--primary-soft);
+  display: flex; align-items: center; gap: 8px;
+}
+.form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.form-grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+label { font-size: 0.87rem; font-weight: 600; color: var(--text); }
+label .req { color: var(--accent); }
+input, select, textarea {
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Cairo', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  direction: rtl;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(41,128,185,0.1);
+}
+textarea { resize: vertical; min-height: 80px; }
+.img-upload-area {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: #fafcff;
+  position: relative;
+}
+.img-upload-area:hover { border-color: var(--primary-light); background: var(--primary-soft); }
+.img-upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.upload-icon { font-size: 2.5rem; margin-bottom: 8px; }
+.upload-text { font-size: 0.9rem; color: var(--text-muted); }
+.upload-preview { max-width: 200px; max-height: 150px; border-radius: 8px; margin-top: 10px; display: none; }
+
+/* ===== SIGNATURE LINE ===== */
+.signature-section {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 30px; margin-top: 24px;
+  padding-top: 20px;
+  border-top: 2px solid var(--primary-soft);
+}
+.sig-box { text-align: center; }
+.sig-label { font-weight: 700; color: var(--primary); font-size: 0.9rem; margin-bottom: 8px; }
+.sig-line {
+  border-bottom: 1.5px solid var(--text-muted);
+  margin: 0 20px;
+  padding-top: 30px;
+}
+.sig-name-input {
+  border: none; border-bottom: 1.5px solid var(--border);
+  border-radius: 0; text-align: center; background: transparent;
+  width: 100%;
+}
+
+/* ===== BUTTONS ===== */
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; justify-content: center; }
+.btn {
+  padding: 11px 24px;
+  border: none; border-radius: 40px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 0.9rem; font-weight: 700;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  transition: all 0.3s;
+}
+.btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(26,82,118,0.3); }
+.btn-primary:hover { background: var(--primary-light); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,82,118,0.4); }
+.btn-accent { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(192,57,43,0.3); }
+.btn-accent:hover { background: var(--accent-light); transform: translateY(-1px); }
+.btn-success { background: var(--success); color: white; }
+.btn-success:hover { background: #219150; transform: translateY(-1px); }
+.btn-gold { background: var(--gold); color: white; }
+.btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); }
+.btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+.btn-outline:hover { background: var(--primary); color: white; }
+.btn-sm { padding: 7px 14px; font-size: 0.8rem; }
+.btn-danger { background: #e74c3c; color: white; }
+.btn-danger:hover { background: #c0392b; }
+
+/* ===== TABLE ===== */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+th {
+  background: var(--primary);
+  color: white;
+  padding: 12px 14px;
+  text-align: right;
+  font-weight: 600;
+  white-space: nowrap;
+}
+td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+  vertical-align: middle;
+}
+tr:hover td { background: #f5f9ff; }
+tr:last-child td { border-bottom: none; }
+.badge {
+  display: inline-block;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 0.75rem; font-weight: 600;
+}
+.badge-blue { background: var(--primary-soft); color: var(--primary); }
+.badge-green { background: #d5f5e3; color: #1e8449; }
+.badge-gold { background: #fef9e7; color: #b7770d; }
+
+/* ===== SEARCH ===== */
+.search-bar {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 18px;
+  background: var(--primary-soft);
+  padding: 14px 18px;
+  border-radius: var(--radius);
+}
+.search-bar input, .search-bar select {
+  flex: 1; min-width: 160px;
+  background: white;
+}
+.action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  align-items: center; justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: white; border-radius: var(--radius);
+  width: 100%; max-width: 700px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: modalIn 0.3s ease;
+}
+@keyframes modalIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.modal-header {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white; padding: 16px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0;
+}
+.modal-close { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; line-height: 1; }
+.modal-body { padding: 24px; }
+
+/* ===== ALERTS ===== */
+.alert {
+  padding: 12px 18px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+  display: flex; align-items: center; gap: 10px;
+  animation: fadeIn 0.3s;
+}
+.alert-success { background: #d5f5e3; color: #1e8449; border-right: 4px solid #27ae60; }
+.alert-error { background: #fde8e6; color: #c0392b; border-right: 4px solid #e74c3c; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ===== LOGO UPLOAD ===== */
+.logo-upload-section {
+  background: var(--primary-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.logo-preview-box {
+  width: 70px; height: 70px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  overflow: hidden;
+  background: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+}
+.logo-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  text-align: center; padding: 50px 20px;
+  color: var(--text-muted);
+}
+.empty-icon { font-size: 3rem; margin-bottom: 12px; }
+.empty-text { font-size: 1rem; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .site-header { padding: 16px; }
+  .school-info h1 { font-size: 1.3rem; }
+  .content { padding: 16px; }
+  .form-grid, .form-grid-3 { grid-template-columns: 1fr; }
+  .signature-section { grid-template-columns: 1fr; }
+  .stats-bar { padding: 12px; gap: 10px; }
+  .stat-item { padding: 8px 14px; }
+}
+
+/* ===== PRINT ===== */
+@media print {
+  @page { size: A4; margin: 8mm; }
+  body > *:not(#printOverlay) { display: none !important; visibility: hidden !important; }
+  #printOverlay {
+    display: block !important;
+    visibility: visible !important;
+    position: static !important;
+    overflow: visible !important;
+    background: white !important;
+    width: 100% !important;
+  }
+  #printOverlay > div:first-child { display: none !important; }
+  #printContent {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+  * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
+  .print-wrap { border: none !important; max-width: 100% !important; }
+}
+
+.tab-content { animation: fadeIn 0.25s; }
+
+/* Row print btn style */
+.row-print-btn {
+  background: var(--primary); color: white;
+  border: none; border-radius: 20px;
+  padding: 5px 12px; font-family:'Cairo',sans-serif;
+  font-size: 0.78rem; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 5px;
+  transition: all 0.2s;
+}
+.row-print-btn:hover { background: var(--primary-light); transform: translateY(-1px); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="school-logo-area">
+      <div class="school-logo" id="headerLogo">
+        <span class="school-logo-placeholder">🏫</span>
+      </div>
+      <div class="school-info">
+        <h1>مدارس الإيمان</h1>
+        <p>نظام التوثيق التربوي</p>
+      </div>
+    </div>
+    <span class="header-badge" id="academicYearBadge">العام الدراسي 2025-2026</span>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="main-nav">
+  <button class="nav-btn active" onclick="showSection('visits')" id="nav-visits">
+    <span class="nav-icon">🤝</span> الزيارات التبادلية
+  </button>
+  <button class="nav-btn" onclick="showSection('strategies')" id="nav-strategies">
+    <span class="nav-icon">📚</span> الاستراتيجيات والوسائل
+  </button>
+  <button class="nav-btn" onclick="showSection('workshops')" id="nav-workshops">
+    <span class="nav-icon">📋</span> ورش العمل
+  </button>
+  <button class="nav-btn" onclick="showSection('settings')" id="nav-settings">
+    <span class="nav-icon">⚙️</span> الإعدادات
+  </button>
+</nav>
+
+<!-- STATS BAR -->
+<div class="stats-bar" id="statsBar">
+  <div class="stat-item"><span class="stat-num" id="stat-visits">0</span><span class="stat-label">زيارة تبادلية</span></div>
+  <div class="stat-item"><span class="stat-num" id="stat-strategies">0</span><span class="stat-label">تطبيق استراتيجية</span></div>
+  <div class="stat-item"><span class="stat-num" id="stat-workshops">0</span><span class="stat-label">ورشة عمل</span></div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content">
+
+<!-- ======== SECTION 1: VISITS ======== -->
+<div class="section active" id="section-visits">
+
+  <!-- FORM -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-header-icon">➕</span>
+      <h2>إضافة زيارة تبادلية جديدة</h2>
+    </div>
+    <div class="card-body">
+      <div id="visit-alert"></div>
+
+      <div class="section-label">📌 المعلومات الأساسية</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>اسم المعلمة الزائرة <span class="req">*</span></label>
+          <input type="text" id="v_visitor" placeholder="أدخلي الاسم">
+        </div>
+        <div class="form-group">
+          <label>اسم المعلمة المُزارَة <span class="req">*</span></label>
+          <input type="text" id="v_visited" placeholder="أدخلي الاسم">
+        </div>
+        <div class="form-group">
+          <label>المادة <span class="req">*</span></label>
+          <input type="text" id="v_subject" placeholder="مثل: رياضيات">
+        </div>
+        <div class="form-group">
+          <label>الصف <span class="req">*</span></label>
+          <input type="text" id="v_class" placeholder="مثل: الثالث الابتدائي">
+        </div>
+        <div class="form-group">
+          <label>اليوم</label>
+          <select id="v_day">
+            <option value="">اختاري اليوم</option>
+            <option>الأحد</option><option>الاثنين</option><option>الثلاثاء</option>
+            <option>الأربعاء</option><option>الخميس</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>الحصة</label>
+          <select id="v_period">
+            <option value="">اختاري الحصة</option>
+            <option>الأولى</option><option>الثانية</option><option>الثالثة</option>
+            <option>الرابعة</option><option>الخامسة</option><option>السادسة</option><option>السابعة</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>التاريخ <span class="req">*</span></label>
+          <input type="date" id="v_date">
+        </div>
+      </div>
+
+      <div class="section-label">🎯 أهداف البرنامج والتاريخ</div>
+      <div class="form-group">
+        <textarea id="v_goals" placeholder="أدخلي أهداف الزيارة التبادلية..."></textarea>
+      </div>
+
+      <div class="section-label">📝 أبرز الملاحظات</div>
+      <div class="form-group">
+        <textarea id="v_notes" placeholder="أدخلي الملاحظات..."></textarea>
+      </div>
+
+      <div class="section-label">📷 الشواهد الصورية <span style="color:var(--accent)">*</span></div>
+      <div class="img-upload-area" id="v_upload_area">
+        <input type="file" id="v_image" accept="image/*" onchange="previewImg(this,'v_preview')">
+        <div class="upload-icon">📷</div>
+        <div class="upload-text">اضغطي لرفع صورة (إجباري)<br><small>JPG, PNG, GIF</small></div>
+        <img id="v_preview" class="upload-preview">
+      </div>
+
+      <div class="btn-row no-print">
+        <button class="btn btn-primary" onclick="saveVisit()">💾 حفظ السجل</button>
+        <button class="btn btn-accent" onclick="printVisitForm()">🖨️ طباعة / تصدير PDF</button>
+        <button class="btn btn-outline" onclick="clearForm('visit')">🗑️ مسح الحقول</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-header-icon">📊</span>
+      <h2>سجلات الزيارات التبادلية</h2>
+    </div>
+    <div class="card-body">
+      <div class="search-bar no-print">
+        <input type="text" id="v_search" placeholder="🔍 بحث بالاسم..." oninput="renderVisitsTable()">
+        <input type="date" id="v_search_date" oninput="renderVisitsTable()">
+        <button class="btn btn-success btn-sm" onclick="exportVisitsExcel()">📊 Excel</button>
+        <button class="btn btn-accent btn-sm" onclick="exportVisitsPDF()">📄 PDF</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>الزائرة</th>
+              <th>المُزارَة</th>
+              <th>المادة</th>
+              <th>الصف</th>
+              <th>التاريخ</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="visits-tbody"></tbody>
+        </table>
+      </div>
+      <div id="visits-empty" class="empty-state" style="display:none">
+        <div class="empty-icon">📋</div>
+        <div class="empty-text">لا توجد سجلات بعد</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== SECTION 2: STRATEGIES ======== -->
+<div class="section" id="section-strategies">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-header-icon">➕</span>
+      <h2>إضافة استراتيجية / وسيلة تعليمية</h2>
+    </div>
+    <div class="card-body">
+      <div id="strat-alert"></div>
+
+      <div class="section-label">📌 المعلومات الأساسية</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>المادة الدراسية <span class="req">*</span></label>
+          <input type="text" id="s_subject" placeholder="مثل: اللغة العربية">
+        </div>
+        <div class="form-group">
+          <label>عنوان الدرس <span class="req">*</span></label>
+          <input type="text" id="s_lesson" placeholder="عنوان الدرس">
+        </div>
+        <div class="form-group">
+          <label>الصف <span class="req">*</span></label>
+          <input type="text" id="s_class" placeholder="الصف الدراسي">
+        </div>
+        <div class="form-group">
+          <label>الفصل</label>
+          <input type="text" id="s_semester" placeholder="مثل: الأول">
+        </div>
+        <div class="form-group">
+          <label>تاريخ التطبيق <span class="req">*</span></label>
+          <input type="date" id="s_date">
+        </div>
+        <div class="form-group">
+          <label>عدد الطالبات</label>
+          <input type="number" id="s_students" placeholder="العدد" min="1">
+        </div>
+      </div>
+
+      <div class="section-label">🎯 تفاصيل الاستراتيجية</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>اسم الاستراتيجية المطبقة <span class="req">*</span></label>
+          <input type="text" id="s_name" placeholder="مثل: التعلم التعاوني">
+        </div>
+        <div class="form-group full">
+          <label>وصف موجز للاستراتيجية <span class="req">*</span></label>
+          <textarea id="s_desc" placeholder="وصف مختصر للاستراتيجية المستخدمة..."></textarea>
+        </div>
+        <div class="form-group full">
+          <label>الأهداف التعليمية للاستراتيجية</label>
+          <textarea id="s_objectives" placeholder="الأهداف التعليمية..."></textarea>
+        </div>
+      </div>
+
+      <div class="section-label">🛠️ أدوات التنفيذ والنتائج</div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>الوسائل التعليمية المستخدمة</label>
+          <textarea id="s_tools" placeholder="الوسائل والأدوات المستخدمة..."></textarea>
+        </div>
+        <div class="form-group full">
+          <label>تفاعل الطالبات</label>
+          <textarea id="s_interaction" placeholder="ملاحظات حول تفاعل الطالبات..."></textarea>
+        </div>
+      </div>
+
+      <div class="section-label">📷 الشواهد <span style="color:var(--accent)">*</span></div>
+      <div class="img-upload-area">
+        <input type="file" id="s_image" accept="image/*" onchange="previewImg(this,'s_preview')">
+        <div class="upload-icon">📷</div>
+        <div class="upload-text">اضغطي لرفع صورة (إجباري)<br><small>JPG, PNG, GIF</small></div>
+        <img id="s_preview" class="upload-preview">
+      </div>
+
+      <div class="btn-row no-print">
+        <button class="btn btn-primary" onclick="saveStrategy()">💾 حفظ السجل</button>
+        <button class="btn btn-accent" onclick="printStratForm()">🖨️ طباعة / تصدير PDF</button>
+        <button class="btn btn-outline" onclick="clearForm('strategy')">🗑️ مسح الحقول</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-header-icon">📊</span>
+      <h2>سجلات الاستراتيجيات</h2>
+    </div>
+    <div class="card-body">
+      <div class="search-bar no-print">
+        <input type="text" id="s_search" placeholder="🔍 بحث..." oninput="renderStrategiesTable()">
+        <input type="date" id="s_search_date" oninput="renderStrategiesTable()">
+        <button class="btn btn-success btn-sm" onclick="exportStrategiesExcel()">📊 Excel</button>
+        <button class="btn btn-accent btn-sm" onclick="exportStrategiesPDF()">📄 PDF</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>المادة</th>
+              <th>عنوان الدرس</th>
+              <th>الصف</th>
+              <th>الاستراتيجية</th>
+              <th>التاريخ</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="strategies-tbody"></tbody>
+        </table>
+      </div>
+      <div id="strategies-empty" class="empty-state" style="display:none">
+        <div class="empty-icon">📋</div>
+        <div class="empty-text">لا توجد سجلات بعد</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== SECTION 3: WORKSHOPS ======== -->
+<div class="section" id="section-workshops">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-header-icon">➕</span>
+      <h2>إضافة تقرير حضور ورشة عمل</h2>
+    </div>
+    <div class="card-body">
+      <div id="work-alert"></div>
+
+      <div class="section-label">📌 المعلومات الأساسية</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>اسم المعلمة <span class="req">*</span></label>
+          <input type="text" id="w_teacher" placeholder="اسم المعلمة">
+        </div>
+        <div class="form-group">
+          <label>اسم الورشة <span class="req">*</span></label>
+          <input type="text" id="w_workshop" placeholder="اسم الورشة">
+        </div>
+        <div class="form-group">
+          <label>المادة</label>
+          <input type="text" id="w_subject" placeholder="المادة">
+        </div>
+        <div class="form-group">
+          <label>الصف</label>
+          <input type="text" id="w_class" placeholder="الصف">
+        </div>
+        <div class="form-group">
+          <label>اليوم</label>
+          <select id="w_day">
+            <option value="">اختاري اليوم</option>
+            <option>الأحد</option><option>الاثنين</option><option>الثلاثاء</option>
+            <option>الأربعاء</option><option>الخميس</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>التاريخ <span class="req">*</span></label>
+          <input type="date" id="w_date">
+        </div>
+        <div class="form-group">
+          <label>عدد الطالبات</label>
+          <input type="number" id="w_students" placeholder="العدد" min="1">
+        </div>
+      </div>
+
+      <div class="section-label">📷 الشواهد</div>
+      <div class="img-upload-area">
+        <input type="file" id="w_image" accept="image/*" onchange="previewImg(this,'w_preview')">
+        <div class="upload-icon">📷</div>
+        <div class="upload-text">اضغطي لرفع صورة<br><small>JPG, PNG, GIF</small></div>
+        <img id="w_preview" class="upload-preview">
+      </div>
+
+      <div class="btn-row no-print">
+        <button class="btn btn-primary" onclick="saveWorkshop()">💾 حفظ السجل</button>
+        <button class="btn btn-accent" onclick="printWorkshopForm()">🖨️ طباعة / تصدير PDF</button>
+        <button class="btn btn-outline" onclick="clearForm('workshop')">🗑️ مسح الحقول</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-header-icon">📊</span>
+      <h2>أرشيف ورش العمل</h2>
+    </div>
+    <div class="card-body">
+      <div class="search-bar no-print">
+        <input type="text" id="w_search" placeholder="🔍 بحث بالاسم أو الورشة..." oninput="renderWorkshopsTable()">
+        <input type="date" id="w_search_date" oninput="renderWorkshopsTable()">
+        <button class="btn btn-accent btn-sm" onclick="exportWorkshopsPDF()">📄 PDF</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>اسم المعلمة</th>
+              <th>الورشة</th>
+              <th>المادة</th>
+              <th>الصف</th>
+              <th>التاريخ</th>
+              <th>العدد</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="workshops-tbody"></tbody>
+        </table>
+      </div>
+      <div id="workshops-empty" class="empty-state" style="display:none">
+        <div class="empty-icon">📋</div>
+        <div class="empty-text">لا توجد سجلات بعد</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== SECTION 4: SETTINGS ======== -->
+<div class="section" id="section-settings">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-header-icon">⚙️</span>
+      <h2>إعدادات النظام</h2>
+    </div>
+    <div class="card-body">
+      <div class="section-label">🏫 شعار ومعلومات المدرسة</div>
+      <div class="logo-upload-section">
+        <div class="logo-preview-box" id="logoPreviewBox">
+          <span id="logoPlaceholder">🏫</span>
+          <img id="logoImg" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:50%;">
+        </div>
+        <div>
+          <label class="btn btn-primary btn-sm" style="cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+            📂 رفع شعار المدرسة
+            <input type="file" id="logoUpload" accept="image/*" style="display:none" onchange="uploadLogo(this)">
+          </label>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-top:6px;">يظهر الشعار في رأس الصفحة وفي التقارير المطبوعة</p>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top:16px;">
+        <label>اسم مديرة المدرسة (الافتراضي)</label>
+        <input type="text" id="defaultPrincipal" placeholder="اسم مديرة المدرسة">
+      </div>
+      <button class="btn btn-primary" onclick="saveSettings()" style="margin-top:12px;">💾 حفظ الإعدادات</button>
+      <div id="settings-alert" style="margin-top:10px;"></div>
+
+      <div class="section-label" style="margin-top:28px;">🗄️ إدارة البيانات</div>
+      <div class="btn-row">
+        <button class="btn btn-danger btn-sm" onclick="clearAllData()">🗑️ حذف جميع البيانات</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<!-- EDIT MODAL (reused for all) -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="editModalTitle">تعديل السجل</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="editModalBody"></div>
+  </div>
+</div>
+
+<!-- PRINT SINGLE RECORD OVERLAY -->
+<!-- PRINT OVERLAY -->
+<div id="printOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:white;overflow:auto;">
+  <div style="position:sticky;top:0;background:#1a5276;padding:12px 20px;display:flex;align-items:center;gap:12px;justify-content:space-between;z-index:10;">
+    <div style="display:flex;gap:10px;">
+      <button onclick="doPrint()" style="background:#27ae60;color:white;border:none;padding:9px 20px;border-radius:20px;font-family:'Cairo',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">🖨️ طباعة</button>
+      <button onclick="closePrintOverlay()" style="background:#e74c3c;color:white;border:none;padding:9px 20px;border-radius:20px;font-family:'Cairo',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;">✕ إغلاق</button>
+    </div>
+    <span style="color:white;font-family:'Cairo',sans-serif;font-size:0.9rem;opacity:0.9;">معاينة قبل الطباعة</span>
+  </div>
+  <div id="printContent" style="max-width:820px;margin:20px auto;padding:0 16px 40px;"></div>
+</div>
+
+<script>
+// ============================================================
+// DATA STORAGE
+// ============================================================
+const DB = {
+  get: (k) => { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch { return []; } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v)),
+  getItem: (k) => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  setItem: (k,v) => localStorage.setItem(k, JSON.stringify(v))
+};
+
+let visits = DB.get('iman_visits');
+let strategies = DB.get('iman_strategies');
+let workshops = DB.get('iman_workshops');
+let settings = DB.getItem('iman_settings') || { principal:'', logo:'' };
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  // حساب السنة الدراسية تلقائياً
+  // السنة الدراسية تبدأ في سبتمبر (شهر 9)
+  const now = new Date();
+  const month = now.getMonth() + 1; // 1-12
+  const year = now.getFullYear();
+  let y1, y2;
+  if (month >= 9) { y1 = year; y2 = year + 1; }
+  else { y1 = year - 1; y2 = year; }
+  document.getElementById('academicYearBadge').textContent = `العام الدراسي ${y1}-${y2}`;
+  const today = new Date().toISOString().split('T')[0];
+  ['v_date','s_date','w_date'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = today;
+  });
+
+  // Load settings
+  if(settings.logo) {
+    applyLogo(settings.logo);
+  }
+  if(settings.principal) {
+    document.getElementById('defaultPrincipal').value = settings.principal;
+    // Set default sigs
+    ['v_principal_sig','s_principal_sig','w_principal_sig'].forEach(id => {
+      const el = document.getElementById(id);
+      if(el && !el.value) el.value = settings.principal;
+    });
+  }
+
+  renderAll();
+  updateStats();
+});
+
+function renderAll() {
+  renderVisitsTable();
+  renderStrategiesTable();
+  renderWorkshopsTable();
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function updateStats() {
+  document.getElementById('stat-visits').textContent = visits.length;
+  document.getElementById('stat-strategies').textContent = strategies.length;
+  document.getElementById('stat-workshops').textContent = workshops.length;
+}
+
+// ============================================================
+// IMAGE HANDLING
+// ============================================================
+function previewImg(input, previewId) {
+  const preview = document.getElementById(previewId);
+  if(input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+      input.dataset.base64 = e.target.result;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function getBase64(inputId) {
+  const el = document.getElementById(inputId);
+  return el ? (el.dataset.base64 || '') : '';
+}
+
+// ============================================================
+// ALERTS
+// ============================================================
+function showAlert(containerId, msg, type='success') {
+  const el = document.getElementById(containerId);
+  el.innerHTML = `<div class="alert alert-${type}"><span>${type==='success'?'✅':'❌'}</span> ${msg}</div>`;
+  setTimeout(() => el.innerHTML = '', 3500);
+}
+
+// ============================================================
+// LOGO
+// ============================================================
+function uploadLogo(input) {
+  if(input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      settings.logo = e.target.result;
+      DB.setItem('iman_settings', settings);
+      applyLogo(e.target.result);
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function applyLogo(src) {
+  // Header logo
+  const headerLogo = document.getElementById('headerLogo');
+  headerLogo.innerHTML = `<img src="${src}" alt="شعار المدرسة">`;
+  // Settings preview
+  document.getElementById('logoPlaceholder').style.display = 'none';
+  const logoImg = document.getElementById('logoImg');
+  logoImg.src = src;
+  logoImg.style.display = 'block';
+}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+function saveSettings() {
+  settings.principal = document.getElementById('defaultPrincipal').value;
+  DB.setItem('iman_settings', settings);
+  showAlert('settings-alert','تم حفظ الإعدادات بنجاح');
+  // Update sig fields
+  ['v_principal_sig','s_principal_sig','w_principal_sig'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = settings.principal;
+  });
+}
+
+// ============================================================
+// CLEAR FORMS
+// ============================================================
+function clearForm(type) {
+  if(type==='visit') {
+    ['v_visitor','v_visited','v_subject','v_class','v_day','v_period','v_goals','v_notes','v_teacher_sig'].forEach(id => {
+      const el = document.getElementById(id); if(el) el.value='';
+    });
+    document.getElementById('v_date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('v_preview').style.display='none';
+    document.getElementById('v_image').value='';
+    delete document.getElementById('v_image').dataset.base64;
+  } else if(type==='strategy') {
+    ['s_subject','s_lesson','s_class','s_semester','s_students','s_name','s_desc','s_objectives','s_tools','s_interaction','s_teacher_sig'].forEach(id => {
+      const el = document.getElementById(id); if(el) el.value='';
+    });
+    document.getElementById('s_date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('s_preview').style.display='none';
+    document.getElementById('s_image').value='';
+    delete document.getElementById('s_image').dataset.base64;
+  } else if(type==='workshop') {
+    ['w_teacher','w_workshop','w_subject','w_class','w_day','w_students','w_teacher_sig'].forEach(id => {
+      const el = document.getElementById(id); if(el) el.value='';
+    });
+    document.getElementById('w_date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('w_preview').style.display='none';
+    document.getElementById('w_image').value='';
+    delete document.getElementById('w_image').dataset.base64;
+  }
+}
+
+// ============================================================
+// VISITS
+// ============================================================
+function saveVisit() {
+  const v = val('v_visitor'), vi = val('v_visited'), s = val('v_subject'), c = val('v_class'), d = val('v_date');
+  const img = getBase64('v_image');
+  if(!v||!vi||!s||!c||!d) { showAlert('visit-alert','يرجى ملء الحقول الإجبارية (الزائرة، المُزارَة، المادة، الصف، التاريخ)','error'); return; }
+  if(!img) { showAlert('visit-alert','يرجى رفع صورة (إجباري)','error'); return; }
+
+  const record = {
+    id: Date.now(),
+    visitor: v, visited: vi, subject: s, class: c,
+    day: val('v_day'), period: val('v_period'), date: d,
+    goals: val('v_goals'), notes: val('v_notes'),
+    teacher_sig: val('v_teacher_sig'), principal_sig: val('v_principal_sig'),
+    image: img, created: new Date().toLocaleDateString('ar-SA')
+  };
+  visits.unshift(record);
+  DB.set('iman_visits', visits);
+  updateStats();
+  renderVisitsTable();
+  showAlert('visit-alert','✅ تم حفظ الزيارة التبادلية بنجاح');
+  clearForm('visit');
+}
+
+function renderVisitsTable() {
+  const search = val('v_search').toLowerCase();
+  const dateF = val('v_search_date');
+  let data = visits.filter(r => {
+    const matchText = !search || r.visitor.toLowerCase().includes(search) || r.visited.toLowerCase().includes(search);
+    const matchDate = !dateF || r.date === dateF;
+    return matchText && matchDate;
+  });
+
+  const tbody = document.getElementById('visits-tbody');
+  document.getElementById('visits-empty').style.display = data.length ? 'none' : 'block';
+  tbody.innerHTML = data.map((r,i) => `
+    <tr>
+      <td><span class="badge badge-blue">${i+1}</span></td>
+      <td><strong>${r.visitor}</strong></td>
+      <td>${r.visited}</td>
+      <td>${r.subject}</td>
+      <td>${r.class}</td>
+      <td>${r.date}</td>
+      <td>
+        <div class="action-btns">
+          <button class="row-print-btn" onclick="printVisitRecord(${r.id})">🖨️ طباعة</button>
+          <button class="btn btn-outline btn-sm" onclick="editVisit(${r.id})">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteVisit(${r.id})">🗑️</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function deleteVisit(id) {
+  if(!confirm('هل أنتِ متأكدة من الحذف؟')) return;
+  visits = visits.filter(r => r.id !== id);
+  DB.set('iman_visits', visits);
+  updateStats(); renderVisitsTable();
+}
+
+function editVisit(id) {
+  const r = visits.find(x => x.id===id);
+  if(!r) return;
+  document.getElementById('editModalTitle').textContent = 'تعديل الزيارة التبادلية';
+  document.getElementById('editModalBody').innerHTML = `
+    <div class="form-grid">
+      <div class="form-group"><label>الزائرة</label><input id="e_visitor" value="${r.visitor}"></div>
+      <div class="form-group"><label>المُزارَة</label><input id="e_visited" value="${r.visited}"></div>
+      <div class="form-group"><label>المادة</label><input id="e_subject" value="${r.subject}"></div>
+      <div class="form-group"><label>الصف</label><input id="e_class" value="${r.class}"></div>
+      <div class="form-group"><label>التاريخ</label><input type="date" id="e_date" value="${r.date}"></div>
+      <div class="form-group"><label>اليوم</label><input id="e_day" value="${r.day}"></div>
+    </div>
+    <div class="form-group" style="margin-top:12px"><label>الأهداف</label><textarea id="e_goals">${r.goals}</textarea></div>
+    <div class="form-group" style="margin-top:12px"><label>الملاحظات</label><textarea id="e_notes">${r.notes}</textarea></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="updateVisit(${id})">💾 حفظ التعديلات</button>
+      <button class="btn btn-outline" onclick="closeModal()">إلغاء</button>
+    </div>
+  `;
+  openModal();
+}
+
+function updateVisit(id) {
+  const idx = visits.findIndex(x => x.id===id);
+  if(idx<0) return;
+  visits[idx] = { ...visits[idx],
+    visitor: val('e_visitor'), visited: val('e_visited'),
+    subject: val('e_subject'), class: val('e_class'),
+    date: val('e_date'), day: val('e_day'),
+    goals: val('e_goals'), notes: val('e_notes')
+  };
+  DB.set('iman_visits', visits);
+  renderVisitsTable();
+  closeModal();
+}
+
+// ============================================================
+// STRATEGIES
+// ============================================================
+function saveStrategy() {
+  const s = val('s_subject'), l = val('s_lesson'), c = val('s_class'), d = val('s_date'), n = val('s_name'), desc = val('s_desc');
+  const img = getBase64('s_image');
+  if(!s||!l||!c||!d||!n||!desc) { showAlert('strat-alert','يرجى ملء الحقول الإجبارية','error'); return; }
+  if(!img) { showAlert('strat-alert','يرجى رفع صورة (إجباري)','error'); return; }
+
+  const record = {
+    id: Date.now(), subject: s, lesson: l, class: c,
+    semester: val('s_semester'), date: d, students: val('s_students'),
+    name: n, desc, objectives: val('s_objectives'),
+    tools: val('s_tools'), interaction: val('s_interaction'),
+    teacher_sig: val('s_teacher_sig'), principal_sig: val('s_principal_sig'),
+    image: img
+  };
+  strategies.unshift(record);
+  DB.set('iman_strategies', strategies);
+  updateStats(); renderStrategiesTable();
+  showAlert('strat-alert','✅ تم حفظ السجل بنجاح');
+  clearForm('strategy');
+}
+
+function renderStrategiesTable() {
+  const search = val('s_search').toLowerCase();
+  const dateF = val('s_search_date');
+  let data = strategies.filter(r => {
+    const matchText = !search || r.subject.toLowerCase().includes(search) || r.name.toLowerCase().includes(search);
+    const matchDate = !dateF || r.date === dateF;
+    return matchText && matchDate;
+  });
+
+  const tbody = document.getElementById('strategies-tbody');
+  document.getElementById('strategies-empty').style.display = data.length ? 'none' : 'block';
+  tbody.innerHTML = data.map((r,i) => `
+    <tr>
+      <td><span class="badge badge-gold">${i+1}</span></td>
+      <td>${r.subject}</td>
+      <td><strong>${r.lesson}</strong></td>
+      <td>${r.class}</td>
+      <td><span class="badge badge-blue">${r.name}</span></td>
+      <td>${r.date}</td>
+      <td>
+        <div class="action-btns">
+          <button class="row-print-btn" onclick="printStratRecord(${r.id})">🖨️ طباعة</button>
+          <button class="btn btn-outline btn-sm" onclick="editStrategy(${r.id})">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteStrategy(${r.id})">🗑️</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function deleteStrategy(id) {
+  if(!confirm('هل أنتِ متأكدة من الحذف؟')) return;
+  strategies = strategies.filter(r => r.id !== id);
+  DB.set('iman_strategies', strategies);
+  updateStats(); renderStrategiesTable();
+}
+
+function editStrategy(id) {
+  const r = strategies.find(x => x.id===id);
+  if(!r) return;
+  document.getElementById('editModalTitle').textContent = 'تعديل الاستراتيجية';
+  document.getElementById('editModalBody').innerHTML = `
+    <div class="form-grid">
+      <div class="form-group"><label>المادة</label><input id="e_subject" value="${r.subject}"></div>
+      <div class="form-group"><label>عنوان الدرس</label><input id="e_lesson" value="${r.lesson}"></div>
+      <div class="form-group"><label>الصف</label><input id="e_class" value="${r.class}"></div>
+      <div class="form-group"><label>التاريخ</label><input type="date" id="e_date" value="${r.date}"></div>
+      <div class="form-group"><label>اسم الاستراتيجية</label><input id="e_name" value="${r.name}"></div>
+    </div>
+    <div class="form-group" style="margin-top:12px"><label>الوصف</label><textarea id="e_desc">${r.desc}</textarea></div>
+    <div class="form-group" style="margin-top:12px"><label>الأهداف</label><textarea id="e_objectives">${r.objectives}</textarea></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="updateStrategy(${id})">💾 حفظ</button>
+      <button class="btn btn-outline" onclick="closeModal()">إلغاء</button>
+    </div>
+  `;
+  openModal();
+}
+
+function updateStrategy(id) {
+  const idx = strategies.findIndex(x => x.id===id);
+  if(idx<0) return;
+  strategies[idx] = { ...strategies[idx],
+    subject: val('e_subject'), lesson: val('e_lesson'),
+    class: val('e_class'), date: val('e_date'),
+    name: val('e_name'), desc: val('e_desc'), objectives: val('e_objectives')
+  };
+  DB.set('iman_strategies', strategies);
+  renderStrategiesTable();
+  closeModal();
+}
+
+// ============================================================
+// WORKSHOPS
+// ============================================================
+function saveWorkshop() {
+  const t = val('w_teacher'), w = val('w_workshop'), d = val('w_date');
+  if(!t||!w||!d) { showAlert('work-alert','يرجى ملء الحقول الإجبارية','error'); return; }
+
+  const record = {
+    id: Date.now(), teacher: t, workshop: w,
+    subject: val('w_subject'), class: val('w_class'),
+    day: val('w_day'), date: d, students: val('w_students'),
+    teacher_sig: val('w_teacher_sig'), principal_sig: val('w_principal_sig'),
+    image: getBase64('w_image')
+  };
+  workshops.unshift(record);
+  DB.set('iman_workshops', workshops);
+  updateStats(); renderWorkshopsTable();
+  showAlert('work-alert','✅ تم حفظ التقرير بنجاح');
+  clearForm('workshop');
+}
+
+function renderWorkshopsTable() {
+  const search = val('w_search').toLowerCase();
+  const dateF = val('w_search_date');
+  let data = workshops.filter(r => {
+    const matchText = !search || r.teacher.toLowerCase().includes(search) || r.workshop.toLowerCase().includes(search);
+    const matchDate = !dateF || r.date === dateF;
+    return matchText && matchDate;
+  });
+
+  const tbody = document.getElementById('workshops-tbody');
+  document.getElementById('workshops-empty').style.display = data.length ? 'none' : 'block';
+  tbody.innerHTML = data.map((r,i) => `
+    <tr>
+      <td><span class="badge badge-green">${i+1}</span></td>
+      <td><strong>${r.teacher}</strong></td>
+      <td>${r.workshop}</td>
+      <td>${r.subject||'-'}</td>
+      <td>${r.class||'-'}</td>
+      <td>${r.date}</td>
+      <td>${r.students||'-'}</td>
+      <td>
+        <div class="action-btns">
+          <button class="row-print-btn" onclick="printWorkshopRecord(${r.id})">🖨️ طباعة</button>
+          <button class="btn btn-outline btn-sm" onclick="editWorkshop(${r.id})">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteWorkshop(${r.id})">🗑️</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function deleteWorkshop(id) {
+  if(!confirm('هل أنتِ متأكدة من الحذف؟')) return;
+  workshops = workshops.filter(r => r.id !== id);
+  DB.set('iman_workshops', workshops);
+  updateStats(); renderWorkshopsTable();
+}
+
+function editWorkshop(id) {
+  const r = workshops.find(x => x.id===id);
+  if(!r) return;
+  document.getElementById('editModalTitle').textContent = 'تعديل ورشة العمل';
+  document.getElementById('editModalBody').innerHTML = `
+    <div class="form-grid">
+      <div class="form-group"><label>المعلمة</label><input id="e_teacher" value="${r.teacher}"></div>
+      <div class="form-group"><label>الورشة</label><input id="e_workshop" value="${r.workshop}"></div>
+      <div class="form-group"><label>المادة</label><input id="e_subject" value="${r.subject}"></div>
+      <div class="form-group"><label>التاريخ</label><input type="date" id="e_date" value="${r.date}"></div>
+      <div class="form-group"><label>عدد الطالبات</label><input type="number" id="e_students" value="${r.students}"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="updateWorkshop(${id})">💾 حفظ</button>
+      <button class="btn btn-outline" onclick="closeModal()">إلغاء</button>
+    </div>
+  `;
+  openModal();
+}
+
+function updateWorkshop(id) {
+  const idx = workshops.findIndex(x => x.id===id);
+  if(idx<0) return;
+  workshops[idx] = { ...workshops[idx],
+    teacher: val('e_teacher'), workshop: val('e_workshop'),
+    subject: val('e_subject'), date: val('e_date'), students: val('e_students')
+  };
+  DB.set('iman_workshops', workshops);
+  renderWorkshopsTable();
+  closeModal();
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal() { document.getElementById('editModal').classList.add('open'); }
+function closeModal() { document.getElementById('editModal').classList.remove('open'); }
+document.getElementById('editModal').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
+
+// ============================================================
+// PRINT SINGLE RECORD
+// ============================================================
+function getHeaderHTML() {
+  const logo = settings.logo ? `<img src="${settings.logo}" style="width:80px;height:80px;border-radius:50%;border:3px solid #d4a017;object-fit:cover;">` : '<div style="width:80px;height:80px;border-radius:50%;background:#f0f4f8;display:flex;align-items:center;justify-content:center;font-size:30px;border:3px solid #d4a017;">🏫</div>';
+  return `
+  <div style="background:linear-gradient(135deg,#1a5276,#0d3b6e);color:white;padding:20px 30px;text-align:center;display:flex;align-items:center;justify-content:center;gap:20px;border-radius:12px 12px 0 0;">
+    ${logo}
+    <div>
+      <h1 style="font-size:1.6rem;font-weight:800;margin:0;">مدارس الإيمان</h1>
+      <p style="font-size:0.9rem;margin:4px 0 0;opacity:0.85;">نظام التوثيق التربوي</p>
+    </div>
+  </div>`;
+}
+
+function getSignatureHTML() {
+  return `
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:20px;padding-top:16px;border-top:2px solid #d0dce8;">
+    <div style="text-align:center;">
+      <div style="font-weight:700;color:#1a5276;margin-bottom:6px;font-size:0.85rem;">اسم المعلمة</div>
+      <div style="border-bottom:1.5px solid #999;margin:28px 10px 5px;"></div>
+      <small style="color:#666;font-size:0.75rem;">التوقيع</small>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-weight:700;color:#1a5276;margin-bottom:6px;font-size:0.85rem;">مديرة المدرسة</div>
+      <div style="border-bottom:1.5px solid #999;margin:28px 10px 5px;"></div>
+      <small style="color:#666;font-size:0.75rem;">التوقيع</small>
+    </div>
+  </div>`;
+}
+
+function printVisitRecord(id) {
+  const r = visits.find(x => x.id===id);
+  if(!r) return;
+  const imgHTML = r.image ? `<div style="text-align:center;margin-top:10px;"><img src="${r.image}" style="max-width:260px;max-height:180px;border-radius:8px;border:2px solid #d0dce8;"></div>` : '';
+  const html = buildPrintHTML('نموذج الزيارة التبادلية', `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      ${field('اسم المعلمة الزائرة',r.visitor)}
+      ${field('اسم المعلمة المُزارَة',r.visited)}
+      ${field('المادة',r.subject)}
+      ${field('الصف',r.class)}
+      ${field('اليوم',r.day)}
+      ${field('الحصة',r.period)}
+      ${field('التاريخ',r.date)}
+    </div>
+    ${r.goals ? fieldFull('أهداف البرنامج',r.goals) : ''}
+    ${r.notes ? fieldFull('أبرز الملاحظات',r.notes) : ''}
+    <div style="margin-top:10px;font-weight:700;color:#1a5276;border-bottom:2px solid #d6eaf8;padding-bottom:4px;font-size:0.85rem;">📷 الشواهد الصورية</div>
+    ${imgHTML}
+    ${getSignatureHTML()}
+  `);
+  openPrintWindow(html);
+}
+
+function printStratRecord(id) {
+  const r = strategies.find(x => x.id===id);
+  if(!r) return;
+  const imgHTML = r.image ? `<div style="text-align:center;margin-top:10px;"><img src="${r.image}" style="max-width:260px;max-height:180px;border-radius:8px;border:2px solid #d0dce8;"></div>` : '';
+  const html = buildPrintHTML('نموذج استخدام الاستراتيجيات والوسائل', `
+    <div style="font-weight:700;color:#1a5276;border-bottom:2px solid #d6eaf8;padding-bottom:4px;margin-bottom:8px;font-size:0.85rem;">المعلومات الأساسية</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      ${field('المادة الدراسية',r.subject)}
+      ${field('عنوان الدرس',r.lesson)}
+      ${field('الصف',r.class)}
+      ${field('الفصل',r.semester)}
+      ${field('تاريخ التطبيق',r.date)}
+      ${field('عدد الطالبات',r.students)}
+    </div>
+    <div style="font-weight:700;color:#1a5276;border-bottom:2px solid #d6eaf8;padding-bottom:4px;margin:8px 0;font-size:0.85rem;">تفاصيل الاستراتيجية</div>
+    ${field('اسم الاستراتيجية المطبقة',r.name)}
+    ${fieldFull('وصف موجز للاستراتيجية',r.desc)}
+    ${r.objectives?fieldFull('الأهداف التعليمية',r.objectives):''}
+    <div style="font-weight:700;color:#1a5276;border-bottom:2px solid #d6eaf8;padding-bottom:4px;margin:8px 0;font-size:0.85rem;">أدوات التنفيذ والنتائج</div>
+    ${r.tools?fieldFull('الوسائل التعليمية المستخدمة',r.tools):''}
+    ${r.interaction?fieldFull('تفاعل الطالبات',r.interaction):''}
+    <div style="font-weight:700;color:#1a5276;border-bottom:2px solid #d6eaf8;padding-bottom:4px;margin:8px 0;font-size:0.85rem;">📷 الشواهد</div>
+    ${imgHTML}
+    ${getSignatureHTML()}
+  `);
+  openPrintWindow(html);
+}
+
+function printWorkshopRecord(id) {
+  const r = workshops.find(x => x.id===id);
+  if(!r) return;
+  const imgHTML = r.image ? `<div style="text-align:center;margin-top:10px;"><img src="${r.image}" style="max-width:260px;max-height:180px;border-radius:8px;border:2px solid #d0dce8;"></div>` : '';
+  const html = buildPrintHTML('تقرير حضور ورشة عمل', `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      ${field('اسم المعلمة',r.teacher)}
+      ${field('اسم الورشة',r.workshop)}
+      ${field('المادة',r.subject)}
+      ${field('الصف',r.class)}
+      ${field('اليوم',r.day)}
+      ${field('التاريخ',r.date)}
+      ${field('عدد الطالبات',r.students)}
+    </div>
+    <div style="font-weight:700;color:#1a5276;border-bottom:2px solid #d6eaf8;padding-bottom:4px;margin:8px 0;font-size:0.85rem;">📷 الشواهد</div>
+    ${imgHTML}
+    ${getSignatureHTML()}
+  `);
+  openPrintWindow(html);
+}
+
+function field(label, value) {
+  return `<div style="background:#f8fbff;border:1px solid #d0dce8;border-radius:6px;padding:7px 10px;">
+    <div style="font-size:0.7rem;color:#5a6a7a;margin-bottom:2px;">${label}</div>
+    <div style="font-weight:600;color:#1a202c;font-size:0.85rem;">${value||'-'}</div>
+  </div>`;
+}
+function fieldFull(label, value) {
+  return `<div style="background:#f8fbff;border:1px solid #d0dce8;border-radius:6px;padding:7px 10px;margin-bottom:6px;">
+    <div style="font-size:0.7rem;color:#5a6a7a;margin-bottom:2px;">${label}</div>
+    <div style="font-weight:500;color:#1a202c;line-height:1.5;font-size:0.85rem;">${value||'-'}</div>
+  </div>`;
+}
+
+function buildPrintHTML(title, content) {
+  return `<!DOCTYPE html><html lang="ar" dir="rtl">
+  <head><meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Cairo',sans-serif; background:white; direction:rtl; color:#1a202c; font-size:13px; }
+    @media print {
+      @page { size: A4; margin: 8mm; }
+      body { font-size:11px; }
+      button { display:none!important; }
+      .print-wrap { border:none!important; box-shadow:none!important; max-width:100%!important; }
+    }
+  </style>
+  </head>
+  <body>
+  <div class="print-wrap" style="max-width:780px;margin:0 auto;border:1px solid #d0dce8;border-radius:8px;overflow:hidden;">
+    ${getHeaderHTML()}
+    <div style="padding:12px 18px;">
+      <h2 style="color:#1a5276;font-size:1rem;margin-bottom:12px;text-align:center;border-bottom:2px solid #1a5276;padding-bottom:8px;">${title}</h2>
+      ${content}
+    </div>
+    <div style="background:#f0f4f8;padding:7px 16px;text-align:center;font-size:0.72rem;color:#5a6a7a;border-top:1px solid #d0dce8;">
+      مدارس الإيمان | نظام التوثيق التربوي | ${new Date().toLocaleDateString('ar-SA')}
+    </div>
+  </div>
+  </body></html>`;
+}
+
+function openPrintWindow(html) {
+  // Extract body content from the full HTML
+  const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+  const bodyContent = bodyMatch ? bodyMatch[1] : html;
+  // Remove the old print button from extracted content
+  const cleaned = bodyContent.replace(/<button onclick="window\.print\(\)"[^>]*>.*?<\/button>/gi, '');
+  document.getElementById('printContent').innerHTML = cleaned;
+  document.getElementById('printOverlay').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closePrintOverlay() {
+  document.getElementById('printOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function doPrint() {
+  window.print();
+}
+
+// ============================================================
+// PRINT FORM (current form data)
+// ============================================================
+function printVisitForm() {
+  const r = {
+    visitor: val('v_visitor'), visited: val('v_visited'), subject: val('v_subject'),
+    class: val('v_class'), day: val('v_day'), period: val('v_period'), date: val('v_date'),
+    goals: val('v_goals'), notes: val('v_notes'),
+    image: getBase64('v_image')
+  };
+  const imgHTML = r.image ? `<div style="text-align:center;margin-top:10px;"><img src="${r.image}" style="max-width:260px;max-height:180px;border-radius:8px;border:1px solid #d0dce8;"></div>` : '';
+  const html = buildPrintHTML('نموذج الزيارة التبادلية', `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      ${field('اسم المعلمة الزائرة',r.visitor)} ${field('اسم المعلمة المُزارَة',r.visited)}
+      ${field('المادة',r.subject)} ${field('الصف',r.class)}
+      ${field('اليوم',r.day)} ${field('الحصة',r.period)} ${field('التاريخ',r.date)}
+    </div>
+    ${r.goals?fieldFull('أهداف البرنامج',r.goals):''}
+    ${r.notes?fieldFull('أبرز الملاحظات',r.notes):''}
+    <div style="font-weight:700;color:#1a5276;border-bottom:1px solid #d6eaf8;padding-bottom:3px;margin:8px 0 4px;font-size:0.8rem;">📷 الشواهد الصورية</div>
+    ${imgHTML}
+    ${getSignatureHTML()}
+  `);
+  openPrintWindow(html);
+}
+
+function printStratForm() {
+  const r = {
+    subject: val('s_subject'), lesson: val('s_lesson'), class: val('s_class'),
+    semester: val('s_semester'), date: val('s_date'), students: val('s_students'),
+    name: val('s_name'), desc: val('s_desc'), objectives: val('s_objectives'),
+    tools: val('s_tools'), interaction: val('s_interaction'),
+    image: getBase64('s_image')
+  };
+  const imgHTML = r.image ? `<div style="text-align:center;margin-top:10px;"><img src="${r.image}" style="max-width:260px;max-height:180px;border-radius:8px;border:1px solid #d0dce8;"></div>` : '';
+  const html = buildPrintHTML('نموذج الاستراتيجيات والوسائل', `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      ${field('المادة',r.subject)} ${field('الدرس',r.lesson)}
+      ${field('الصف',r.class)} ${field('الفصل',r.semester)}
+      ${field('التاريخ',r.date)} ${field('العدد',r.students)}
+    </div>
+    ${field('اسم الاستراتيجية',r.name)}
+    <div style="margin-top:6px;">${fieldFull('وصف الاستراتيجية',r.desc)}</div>
+    ${r.objectives?fieldFull('الأهداف التعليمية',r.objectives):''}
+    ${r.tools?fieldFull('الوسائل المستخدمة',r.tools):''}
+    ${r.interaction?fieldFull('تفاعل الطالبات',r.interaction):''}
+    <div style="font-weight:700;color:#1a5276;border-bottom:1px solid #d6eaf8;padding-bottom:3px;margin:8px 0 4px;font-size:0.8rem;">📷 الشواهد</div>
+    ${imgHTML}
+    ${getSignatureHTML()}
+  `);
+  openPrintWindow(html);
+}
+
+function printWorkshopForm() {
+  const r = {
+    teacher: val('w_teacher'), workshop: val('w_workshop'), subject: val('w_subject'),
+    class: val('w_class'), day: val('w_day'), date: val('w_date'), students: val('w_students'),
+    image: getBase64('w_image')
+  };
+  const imgHTML = r.image ? `<div style="text-align:center;margin-top:10px;"><img src="${r.image}" style="max-width:260px;max-height:180px;border-radius:8px;border:1px solid #d0dce8;"></div>` : '';
+  const html = buildPrintHTML('تقرير حضور ورشة عمل', `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      ${field('اسم المعلمة',r.teacher)} ${field('اسم الورشة',r.workshop)}
+      ${field('المادة',r.subject)} ${field('الصف',r.class)}
+      ${field('اليوم',r.day)} ${field('التاريخ',r.date)} ${field('العدد',r.students)}
+    </div>
+    <div style="font-weight:700;color:#1a5276;border-bottom:1px solid #d6eaf8;padding-bottom:3px;margin:8px 0 4px;font-size:0.8rem;">📷 الشواهد</div>
+    ${imgHTML}
+    ${getSignatureHTML()}
+  `);
+  openPrintWindow(html);
+}
+
+// ============================================================
+// EXPORT FUNCTIONS
+// ============================================================
+function exportVisitsPDF() {
+  const html = buildPrintHTML('قائمة الزيارات التبادلية', `
+    <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+      <thead><tr style="background:#1a5276;color:white;">
+        <th style="padding:10px;border:1px solid #ccc;">#</th>
+        <th style="padding:10px;border:1px solid #ccc;">الزائرة</th>
+        <th style="padding:10px;border:1px solid #ccc;">المُزارَة</th>
+        <th style="padding:10px;border:1px solid #ccc;">المادة</th>
+        <th style="padding:10px;border:1px solid #ccc;">الصف</th>
+        <th style="padding:10px;border:1px solid #ccc;">التاريخ</th>
+      </tr></thead>
+      <tbody>${visits.map((r,i)=>`<tr style="background:${i%2?'#f8fbff':'white'}">
+        <td style="padding:8px;border:1px solid #eee;text-align:center;">${i+1}</td>
+        <td style="padding:8px;border:1px solid #eee;">${r.visitor}</td>
+        <td style="padding:8px;border:1px solid #eee;">${r.visited}</td>
+        <td style="padding:8px;border:1px solid #eee;">${r.subject}</td>
+        <td style="padding:8px;border:1px solid #eee;">${r.class}</td>
+        <td style="padding:8px;border:1px solid #eee;">${r.date}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+    <p style="text-align:center;margin-top:16px;color:#666;">إجمالي الزيارات: ${visits.length}</p>
+  `);
+  openPrintWindow(html);
+}
+
+function exportStrategiesPDF() {
+  const html = buildPrintHTML('قائمة الاستراتيجيات والوسائل', `
+    <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+      <thead><tr style="background:#1a5276;color:white;">
+        <th style="padding:10px;border:1px solid #ccc;">#</th>
+        <th style="padding:10px;border:1px solid #ccc;">المادة</th>
+        <th style="padding:10px;border:1px solid #ccc;">الدرس</th>
+        <th style="padding:10px;border:1px solid #ccc;">الصف</th>
+        <th style="padding:10px;border:1px solid #ccc;">الاستراتيجية</th>
+        <th style="padding:10px;border:1px solid #ccc;">التاريخ</th>
+      </tr></thead>
+      <tbody>${strategies.map((r,i)=>`<tr style="background:${i%2?'#f8fbff':'white'}">
+        <td style="padding:8px;border:1px solid #eee;text-align:center;">${i+1}</td>
+        <td style="padding:8px;border:1px solid #eee;">${r.subject}</td>
+        <td style="padding:8px;border:1px solid #eee;">${r.lesson}</td>
+        <td style="padding:8px;border:1px solid #eee;">${r.class}</td>
+        <td style="padding:8px;border:1px solid #eee;">${r.name}</td>
+        <td style="padding:8px;border:1px solid #eee;">${r.date}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+    <p style="text-align:center;margin-top:16px;color:#666;">إجمالي السجلات: ${strategies.length}</p>
+  `);
+  openPrintWindow(html);
+}
+
+function exportWorkshopsPDF() {
+  const html = buildPrintHTML('أرشيف ورش العمل', `
+    <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+      <thead><tr style="background:#1a5276;color:white;">
+        <th style="padding:10px;border:1px solid #ccc;">#</th>
+        <th style="padding:10px;border:1px solid #ccc;">المعلمة</th>
+        <th style="padding:10px;border:1px solid #ccc;">الورشة</th>
+        <th style="padding:10px;border:1px solid #ccc;">المادة</th>
+        <th style="padding:10px;border:1px solid #ccc;">التاريخ</th>
+        <th style="padding:10px;border:1px solid #ccc;">العدد</th>
+      </tr></thead>
+      <tbody>${workshops.map((r,i)=>`<tr style="background:${i%2?'#f8fbff':'white'}">
+        <td style="padding:8px;border:1px solid #eee;text-align:center;">${i+1}</td>
+        <td style="padding:8px;border:1px solid #eee;">${r.teacher}</td>
+        <td style="padding:8px;border:1px solid #eee;">${r.workshop}</td>
+        <td style="padding:8px;border:1px solid #eee;">${r.subject||'-'}</td>
+        <td style="padding:8px;border:1px solid #eee;">${r.date}</td>
+        <td style="padding:8px;border:1px solid #eee;">${r.students||'-'}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+    <p style="text-align:center;margin-top:16px;color:#666;">إجمالي الورش: ${workshops.length}</p>
+  `);
+  openPrintWindow(html);
+}
+
+function exportVisitsExcel() {
+  const data = visits.map((r,i) => ({
+    '#': i+1, 'المعلمة الزائرة': r.visitor, 'المعلمة المُزارَة': r.visited,
+    'المادة': r.subject, 'الصف': r.class, 'اليوم': r.day, 'الحصة': r.period,
+    'التاريخ': r.date, 'الأهداف': r.goals, 'الملاحظات': r.notes
+  }));
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'الزيارات');
+  XLSX.writeFile(wb, 'الزيارات_التبادلية.xlsx');
+}
+
+function exportStrategiesExcel() {
+  const data = strategies.map((r,i) => ({
+    '#': i+1, 'المادة': r.subject, 'عنوان الدرس': r.lesson, 'الصف': r.class,
+    'الفصل': r.semester, 'التاريخ': r.date, 'عدد الطالبات': r.students,
+    'اسم الاستراتيجية': r.name, 'الوصف': r.desc, 'الأهداف': r.objectives,
+    'الوسائل': r.tools, 'تفاعل الطالبات': r.interaction
+  }));
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'الاستراتيجيات');
+  XLSX.writeFile(wb, 'الاستراتيجيات_والوسائل.xlsx');
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function val(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+function clearAllData() {
+  if(!confirm('⚠️ هل أنتِ متأكدة من حذف جميع البيانات؟ لا يمكن التراجع!')) return;
+  visits = []; strategies = []; workshops = [];
+  DB.set('iman_visits', visits);
+  DB.set('iman_strategies', strategies);
+  DB.set('iman_workshops', workshops);
+  updateStats(); renderAll();
+}
+</script>
+</body>
+</html>
